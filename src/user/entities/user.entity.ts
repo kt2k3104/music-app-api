@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Song } from 'src/song/entities/song.entity'
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class User {
@@ -31,4 +32,7 @@ export class User {
 
   @CreateDateColumn()
   updated_at: Date
+
+  @OneToMany(() => Song, song => song.user)
+  songs: Song[]
 }

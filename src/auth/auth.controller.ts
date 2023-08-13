@@ -18,9 +18,11 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
+    console.log(registerDto)
     try {
       await this.authService.register(registerDto)
       return {
+        success: true,
         message: 'Register account success!!'
       }
     } catch (error) {
@@ -34,7 +36,7 @@ export class AuthController {
     const data = await this.authService.login(loginDto)
     return {
       message: 'Login success',
-      data
+      ...data
     }
   }
 

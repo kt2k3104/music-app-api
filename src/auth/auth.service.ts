@@ -17,6 +17,14 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
+    const user = this.userRepo.findOneBy({ email: registerDto.email })
+    if (user) {
+      throw new HttpException(
+        'ER_EMAIL_HAD_ACC: Email already have an account',
+        HttpStatus.BAD_REQUEST
+      )
+    }
+
     const hashPassword = await this.hashPassword(registerDto.password)
 
     return await this.userRepo.save({
@@ -31,18 +39,20 @@ export class AuthService {
     })
 
     if (!user) {
-      throw new HttpException('Email is not exist', HttpStatus.UNAUTHORIZED)
+      throw new HttpException('ER_EMAIL_NOTF: Email is not exist', HttpStatus.UNAUTHORIZED)
     }
 
     const checkPass = bcrypt.compareSync(loginDto.password, user.password)
     if (!checkPass) {
-      throw new HttpException('Is password is not correct', HttpStatus.UNAUTHORIZED)
+      throw new HttpException('ER_PASS_IN_COR: Is password is not correct', HttpStatus.UNAUTHORIZED)
     }
 
     // generate access token and refresh token
     const payload = { id: user.id, email: user.email }
 
-    return this.generateToken(payload)
+    const tokens = await this.generateToken(payload)
+
+    return { tokens, id: user.id }
   }
 
   async refreshToken(refresh_token: string): Promise<any> {

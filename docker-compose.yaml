@@ -4,12 +4,12 @@ services:
     image: mysql
     container_name: mysql-blogdb
     ports:
-      - '3307:3306'
+      - '3308:3306'
     environment:
       MYSQL_ROOT_PASSWORD: 1121212
       MYSQL_DATABASE: blogdb
     volumes:
-      - /home/thinhnguyen/dev/db/blog-nest:/var/lib/mysql
+      - /home/khai/dev/db/music-app-db:/var/lib/mysql
     networks:
       - nest-blog-network
 networks:

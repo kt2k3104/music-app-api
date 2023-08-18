@@ -16,61 +16,82 @@ import {
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { AuthGuard } from 'src/auth/auth.guard'
-import { User } from './entities/user.entity'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { DeleteResult, UpdateResult } from 'typeorm'
 import { FilterUserDto } from './dto/filter-user.dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { storageConfig } from 'helpers/config'
-import { filterConfig } from 'helpers/upload-file-config'
+import { filterImageConfig } from 'helpers/upload-file-config'
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 
 @ApiBearerAuth()
 @ApiTags('User')
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private cloudinaryService: CloudinaryService
+  ) {}
 
   @UseGuards(AuthGuard)
   @Get()
-  getAllUser(@Query() query: FilterUserDto): Promise<any> {
-    return this.userService.getAllUser(query)
+  async getAllUser(@Query() query: FilterUserDto) {
+    return {
+      success: true,
+      result: await this.userService.getAllUser(query)
+    }
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  getUser(@Request() req: any, @Param('id', ParseIntPipe) id: number): Promise<User> {
+  async getUser(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
     if (req.user_data.id !== id) {
       throw new BadRequestException('You do not have permission!')
     }
-    return this.userService.getUser(id)
+
+    return {
+      success: true,
+      result: await this.userService.getUser(id)
+    }
   }
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto)
+  async create(@Body() createUserDto: CreateUserDto) {
+    return {
+      success: true,
+      result: await this.userService.create(createUserDto)
+    }
   }
 
   @UseGuards(AuthGuard)
   @Put(':id')
-  update(
+  async update(
     @Request() req: any,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto
-  ): Promise<UpdateResult> {
+  ) {
     console.log(req.user_data.id)
     if (req.user_data.id !== id) {
       throw new BadRequestException('You do not have permission!')
     }
-    return this.userService.update(id, updateUserDto)
+    return {
+      success: true,
+      result: await this.userService.update(id, updateUserDto)
+    }
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
-    return this.userService.delete(id)
+  async delete(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    if (req.user_data.status !== 1) {
+      throw new BadRequestException('You do not have permission!')
+    }
+    return {
+      success: true,
+      result: await this.userService.delete(id)
+    }
   }
 
   @Post('upload-avt')
@@ -78,10 +99,10 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       storage: storageConfig('avatars'),
-      fileFilter: filterConfig()
+      fileFilter: filterImageConfig()
     })
   )
-  uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+  async uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError)
     }
@@ -89,6 +110,12 @@ export class UserController {
     if (!file) {
       throw new BadRequestException('File is required')
     }
-    return this.userService.updateAvatar(req.user_data.id, file.destination + '/' + file.filename)
+
+    const cloudFile = await this.cloudinaryService.uploadFile(file, 'image-avt')
+
+    return {
+      success: true,
+      result: await this.userService.updateAvatar(req.user_data.id, cloudFile.url)
+    }
   }
 }

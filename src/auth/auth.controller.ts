@@ -11,6 +11,12 @@ import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { ApiTags } from '@nestjs/swagger'
 
+interface ResponseAPI<T> {
+  success: boolean
+  message?: string
+  result?: Promise<T>
+}
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -35,13 +41,17 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<any> {
     const data = await this.authService.login(loginDto)
     return {
+      success: true,
       message: 'Login success',
-      ...data
+      result: data
     }
   }
 
   @Post('refresh-token')
-  refreshToken(@Body() { refresh_token }): Promise<any> {
-    return this.authService.refreshToken(refresh_token)
+  refreshToken(@Body() { refresh_token }): ResponseAPI<any> {
+    return {
+      success: true,
+      result: this.authService.refreshToken(refresh_token)
+    }
   }
 }

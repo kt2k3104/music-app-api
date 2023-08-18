@@ -17,7 +17,8 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
-    const user = this.userRepo.findOneBy({ email: registerDto.email })
+    const user = await this.userRepo.findOneBy({ email: registerDto.email })
+    console.log(user)
     if (user) {
       throw new HttpException(
         'ER_EMAIL_HAD_ACC: Email already have an account',
@@ -48,7 +49,7 @@ export class AuthService {
     }
 
     // generate access token and refresh token
-    const payload = { id: user.id, email: user.email }
+    const payload = { id: user.id, email: user.email, status: user.status }
 
     const tokens = await this.generateToken(payload)
 

@@ -1,5 +1,5 @@
 {
-  "name": "blog-nest",
+  "name": "musicapp-nest",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -37,6 +37,8 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cloudinary": "^1.40.0",
+    "dotenv": "^16.3.1",
     "mysql2": "^3.6.0",
     "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",

@@ -6,10 +6,14 @@ import * as bcrypt from 'bcrypt'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { FilterUserDto } from './dto/filter-user.dto'
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private cloundaryService: CloudinaryService
+  ) {}
 
   async getAllUser(query: FilterUserDto): Promise<any> {
     const items_per_page = Number(query.items_per_page) || 10
@@ -73,6 +77,10 @@ export class UserService {
   }
 
   async delete(id: number): Promise<DeleteResult> {
+    const user = await this.userRepo.findOneBy({ id })
+    if (user) {
+      await this.cloundaryService.destroyFile(user.avatar, 'image-avt')
+    }
     return await this.userRepo.delete(id)
   }
 

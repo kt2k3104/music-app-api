@@ -9,7 +9,7 @@ export const storageConfig = (folder: string) =>
     }
   })
 
-export const filterConfig =
+export const filterImageConfig =
   () => (req: any, file: MulterFile, cb: (error: Error, acceptFile: boolean) => void) => {
     const extension = extname(file.originalname)
     const allowdExtArr = ['.jpg', '.png', '.jpeg']
@@ -20,6 +20,24 @@ export const filterConfig =
       const fileSize = parseInt(req.headers['content-length'])
       if (fileSize > 1024 * 1024 * 5) {
         req.fileValidationError = 'file size is too large. Accepted file size is less than 5 MB'
+        cb(null, false)
+      } else {
+        cb(null, true)
+      }
+    }
+  }
+
+export const filterAudioConfig =
+  () => (req: any, file: MulterFile, cb: (error: Error, acceptFile: boolean) => void) => {
+    const extension = extname(file.originalname)
+    const allowdExtArr = ['.mp3']
+    if (!allowdExtArr.includes(extension)) {
+      req.fileValidationError = 'wrong extension type. Accepted file ext are:  mp3'
+      cb(null, false)
+    } else {
+      const fileSize = parseInt(req.headers['content-length'])
+      if (fileSize > 1024 * 1024 * 20) {
+        req.fileValidationError = 'file size is too large. Accepted file size is less than 20 MB'
         cb(null, false)
       } else {
         cb(null, true)

@@ -57,15 +57,16 @@ export class AuthService {
   }
 
   async refreshToken(refresh_token: string): Promise<any> {
+    console.log(refresh_token)
     try {
       const verify = await this.jwtSercive.verifyAsync(refresh_token, {
-        secret: 'secret'
+        secret: this.configService.get<string>('JWT_SECRET_KEY')
       })
       const checkToken = await this.userRepo.findOneBy({ email: verify.email, refresh_token })
       if (checkToken) {
         return this.generateToken({ id: verify.id, email: verify.email })
       } else {
-        throw new HttpException('Refresh token is not valid', HttpStatus.BAD_REQUEST)
+        throw new HttpException('Refresh token is not validddd', HttpStatus.BAD_REQUEST)
       }
     } catch (error) {
       throw new HttpException('Refresh token is not valid', HttpStatus.BAD_REQUEST)

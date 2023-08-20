@@ -48,10 +48,15 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  refreshToken(@Body() { refresh_token }): ResponseAPI<any> {
-    return {
-      success: true,
-      result: this.authService.refreshToken(refresh_token)
+  async refreshToken(@Body() body: any): Promise<any> {
+    console.log(body)
+    try {
+      return {
+        success: true,
+        result: await this.authService.refreshToken(body.refresh_token)
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message)
     }
   }
 }

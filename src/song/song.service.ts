@@ -77,6 +77,22 @@ export class SongService {
     return song
   }
 
+  async getSongByUserId(userId: number): Promise<any> {
+    try {
+      const user = await this.userRepo.findOne({
+        where: { id: userId },
+        relations: { songs: true }
+      })
+      if (!user) {
+        throw new HttpException('user not found !', HttpStatus.NOT_FOUND)
+      }
+      console.log(user)
+      return user.songs
+    } catch (error: any) {
+      throw new BadRequestException(error.message)
+    }
+  }
+
   async update(updateSongDto: UpdateSongDto, songId: number, userId: number): Promise<any> {
     const song = await this.songRepo.findOne({
       where: { id: songId },

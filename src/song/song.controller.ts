@@ -131,6 +131,15 @@ export class SongController {
     }
   }
 
+  @UseGuards(AuthGuard)
+  @Get('user/:userId')
+  async getSongByUserId(@Param('userId', ParseIntPipe) userId: number): Promise<any> {
+    return {
+      success: true,
+      result: await this.songService.getSongByUserId(userId)
+    }
+  }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Put(':id')

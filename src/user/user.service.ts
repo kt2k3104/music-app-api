@@ -62,6 +62,9 @@ export class UserService {
       where: {
         id
       },
+      relations: {
+        songs: true
+      },
       select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
     })
   }

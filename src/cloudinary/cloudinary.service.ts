@@ -11,12 +11,12 @@ export class CloudinaryService {
     file: Express.Multer.File,
     type: 'image-avt' | 'audio' | 'image-art'
   ): Promise<CloudinaryResponse> {
-    let folderPath = 'musicapp-nest/images/avatars'
+    let folderPath = 'musicapp-nest/images/avatars/'
 
     if (type === 'image-avt') {
-      folderPath = 'musicapp-nest/images/avatars'
+      folderPath = 'musicapp-nest/images/avatars/'
     } else if (type === 'image-art') {
-      folderPath = 'musicapp-nest/images/artworks'
+      folderPath = 'musicapp-nest/images/artworks/'
     } else {
       folderPath = 'musicapp-nest/audios/'
     }
@@ -73,7 +73,10 @@ export class CloudinaryService {
     filePath = path.join(__dirname, '..', '..', '..', filePath)
     console.log(filePath)
     fs.unlink(filePath, err => {
-      if (err) console.log(err)
+      if (err) {
+        console.log(err)
+        console.log('hehe')
+      }
     })
   }
 }

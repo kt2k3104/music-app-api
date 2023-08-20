@@ -63,7 +63,8 @@ export class UserService {
         id
       },
       relations: {
-        songs: true
+        songs: true,
+        favoriteSongs: true
       },
       select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
     })

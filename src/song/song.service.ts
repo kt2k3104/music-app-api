@@ -145,4 +145,45 @@ export class SongService {
 
     return this.songRepo.delete(songId)
   }
+
+  async changeFavorite(userId: number, songId: number): Promise<any> {
+    try {
+      let isFavorited: number = -1
+      const song = await this.songRepo.findOneBy({ id: songId })
+      if (!song) {
+        throw new HttpException('Song not found', HttpStatus.NOT_FOUND)
+      }
+      const user = await this.userRepo.findOne({
+        where: { id: userId },
+        relations: { favoriteSongs: true },
+        select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
+      })
+
+      if (user) {
+        console.log(user)
+        isFavorited = user.favoriteSongs.findIndex(item => {
+          return item.id === song.id
+        })
+
+        console.log(isFavorited)
+
+        if (isFavorited > -1) {
+          user.favoriteSongs = user.favoriteSongs.filter(item => item.id !== song.id)
+        } else {
+          console.log('push')
+          user.favoriteSongs.push(song)
+        }
+      }
+
+      return {
+        success: true,
+        result: {
+          favorited: isFavorited > -1 ? false : true,
+          response: await this.userRepo.save(user)
+        }
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
+  }
 }

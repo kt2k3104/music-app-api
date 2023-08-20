@@ -163,4 +163,17 @@ export class SongController {
       success: true
     }
   }
+
+  @UseGuards(AuthGuard)
+  @Get('favorite/:id')
+  async changeFavorite(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) songId: number
+  ): Promise<any> {
+    try {
+      return await this.songService.changeFavorite(req.user_data.id, songId)
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
+  }
 }

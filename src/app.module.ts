@@ -5,7 +5,7 @@ import { dataSourceOptions } from 'db/data-source'
 import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { SongModule } from './song/song.module'
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module'
 
 @Module({
   imports: [

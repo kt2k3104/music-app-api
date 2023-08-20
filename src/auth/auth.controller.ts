@@ -11,12 +11,6 @@ import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { ApiTags } from '@nestjs/swagger'
 
-interface ResponseAPI<T> {
-  success: boolean
-  message?: string
-  result?: Promise<T>
-}
-
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {

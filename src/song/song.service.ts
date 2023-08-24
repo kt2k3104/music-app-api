@@ -156,7 +156,7 @@ export class SongService {
       const user = await this.userRepo.findOne({
         where: { id: userId },
         relations: { favoriteSongs: true },
-        select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
+        select: ['id', 'first_name', 'last_name', 'email', 'role', 'avatar']
       })
 
       if (user) {

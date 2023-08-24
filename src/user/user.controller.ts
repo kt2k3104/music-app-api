@@ -11,11 +11,9 @@ import {
   Query,
   Request,
   UploadedFile,
-  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import { UserService } from './user.service'
-import { AuthGuard } from 'src/auth/auth.guard'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { FilterUserDto } from './dto/filter-user.dto'
@@ -24,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { storageConfig } from 'helpers/config'
 import { filterImageConfig } from 'helpers/upload-file-config'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
+import { Role } from 'src/auth/decorator/role.decorator'
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -34,7 +33,7 @@ export class UserController {
     private cloudinaryService: CloudinaryService
   ) {}
 
-  @UseGuards(AuthGuard)
+  @Role('admin')
   @Get()
   async getAllUser(@Query() query: FilterUserDto) {
     return {
@@ -43,10 +42,9 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   async getUser(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
-    if (req.user_data.id !== id) {
+    if (req.user.id !== id) {
       throw new BadRequestException('You do not have permission!')
     }
 
@@ -56,7 +54,7 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @Role('admin')
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return {
@@ -65,15 +63,13 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard)
   @Put(':id')
   async update(
     @Request() req: any,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto
   ) {
-    console.log(req.user_data.id)
-    if (req.user_data.id !== id) {
+    if (req.user.id !== id) {
       throw new BadRequestException('You do not have permission!')
     }
     return {
@@ -82,12 +78,9 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @Role('admin')
   @Delete(':id')
-  async delete(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
-    if (req.user_data.status !== 1) {
-      throw new BadRequestException('You do not have permission!')
-    }
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return {
       success: true,
       result: await this.userService.delete(id)
@@ -95,7 +88,6 @@ export class UserController {
   }
 
   @Post('upload-avt')
-  @UseGuards(AuthGuard)
   @UseInterceptors(
     FileInterceptor('avatar', {
       storage: storageConfig('avatars'),
@@ -115,7 +107,7 @@ export class UserController {
 
     return {
       success: true,
-      result: await this.userService.updateAvatar(req.user_data.id, cloudFile.url)
+      result: await this.userService.updateAvatar(req.user.id, cloudFile.url)
     }
   }
 }

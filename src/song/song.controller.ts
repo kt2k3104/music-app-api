@@ -10,14 +10,12 @@ import {
   Put,
   Request,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
 import { CreateBulkSongDto } from './dto/create-bulk-song.dto'
 import { SongService } from './song.service'
-import { AuthGuard } from 'src/auth/auth.guard'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { storageConfig } from 'helpers/config'
 import { filterAudioConfig, filterImageConfig } from 'helpers/upload-file-config'
@@ -25,6 +23,7 @@ import { CreateSongDto } from './dto/create-song.dto'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { UpdateSongDto } from './dto/update-song.dto'
+import { Public } from 'src/auth/decorator/publict.decorator'
 
 @ApiTags('Song')
 @Controller('songs')
@@ -35,18 +34,16 @@ export class SongController {
   ) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Post('bulk')
   createBulk(@Request() req: any, @Body() createBulkSongDto: CreateBulkSongDto): Promise<any> {
-    return this.songService.createBulk(createBulkSongDto, req.user_data.id)
+    return this.songService.createBulk(createBulkSongDto, req.user.id)
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @Post()
   async create(@Request() req: any, @Body() createSongDto: CreateSongDto) {
-    const result = await this.songService.create(createSongDto, req.user_data.id)
+    const result = await this.songService.create(createSongDto, req.user.id)
     result.user = result.user.id
     return {
       success: true,
@@ -55,7 +52,6 @@ export class SongController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Post('upload-audio')
   @UseInterceptors(
     FileInterceptor('song', {
@@ -87,7 +83,6 @@ export class SongController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Post('upload-art')
   @UseInterceptors(
     FileInterceptor('artwork', {
@@ -115,6 +110,7 @@ export class SongController {
     }
   }
 
+  @Public(true)
   @Get()
   async getAllSong(): Promise<any> {
     return {
@@ -123,6 +119,7 @@ export class SongController {
     }
   }
 
+  @Public(true)
   @Get(':id')
   async getSong(@Param('id', ParseIntPipe) songId: number): Promise<any> {
     return {
@@ -131,7 +128,7 @@ export class SongController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Get('user/:userId')
   async getSongByUserId(@Param('userId', ParseIntPipe) userId: number): Promise<any> {
     return {
@@ -141,7 +138,6 @@ export class SongController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) songId: number,
@@ -150,28 +146,27 @@ export class SongController {
   ) {
     return {
       success: true,
-      result: await this.songService.update(updateSongDto, songId, req.user_data.id)
+      result: await this.songService.update(updateSongDto, songId, req.user.id)
     }
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) songId: number, @Request() req: any) {
-    await this.songService.delete(songId, req.user_data.id)
+    await this.songService.delete(songId, req.user.id)
     return {
       success: true
     }
   }
 
-  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Get('favorite/:id')
   async changeFavorite(
     @Request() req: any,
     @Param('id', ParseIntPipe) songId: number
   ): Promise<any> {
     try {
-      return await this.songService.changeFavorite(req.user_data.id, songId)
+      return await this.songService.changeFavorite(req.user.id, songId)
     } catch (error) {
       throw new BadRequestException(error.message)
     }

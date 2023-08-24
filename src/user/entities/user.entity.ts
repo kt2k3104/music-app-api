@@ -32,8 +32,8 @@ export class User {
   @Column({ nullable: true, default: null })
   avatar: string
 
-  @Column({ default: 1 })
-  status: number
+  @Column({ default: 'user' })
+  role: string
 
   @CreateDateColumn()
   created_at: Date

@@ -10,12 +10,14 @@ import { RegisterDto } from './dto/register.dto'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { ApiTags } from '@nestjs/swagger'
+import { Public } from './decorator/publict.decorator'
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public(true)
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     console.log(registerDto)
@@ -30,6 +32,7 @@ export class AuthController {
     }
   }
 
+  @Public(true)
   @UsePipes(ValidationPipe)
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<any> {
@@ -41,9 +44,9 @@ export class AuthController {
     }
   }
 
+  @Public(true)
   @Post('refresh-token')
   async refreshToken(@Body() body: any): Promise<any> {
-    console.log(body)
     try {
       return {
         success: true,

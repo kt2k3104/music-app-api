@@ -22,7 +22,8 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { storageConfig } from 'helpers/config'
 import { filterImageConfig } from 'helpers/upload-file-config'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
-import { Role } from 'src/auth/decorator/role.decorator'
+import { RoleRequire } from 'src/auth/decorator/role.decorator'
+import { Role } from 'src/auth/role.enum'
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -33,7 +34,7 @@ export class UserController {
     private cloudinaryService: CloudinaryService
   ) {}
 
-  @Role('admin')
+  @RoleRequire(Role.Admin)
   @Get()
   async getAllUser(@Query() query: FilterUserDto) {
     return {
@@ -44,17 +45,17 @@ export class UserController {
 
   @Get(':id')
   async getUser(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
-    if (req.user.id !== id) {
+    if (req.user.id === id || req.user.role === Role.Admin) {
+      return {
+        success: true,
+        result: await this.userService.getUser(id)
+      }
+    } else {
       throw new BadRequestException('You do not have permission!')
-    }
-
-    return {
-      success: true,
-      result: await this.userService.getUser(id)
     }
   }
 
-  @Role('admin')
+  @RoleRequire(Role.Admin)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return {
@@ -78,7 +79,7 @@ export class UserController {
     }
   }
 
-  @Role('admin')
+  @RoleRequire(Role.Admin)
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return {

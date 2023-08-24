@@ -35,9 +35,11 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<any> {
-    const user = await this.userRepo.findOne({
-      where: { email: loginDto.email }
-    })
+    const user = await this.userRepo
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email: loginDto.email })
+      .addSelect('user.password')
+      .getOne()
 
     if (!user) {
       throw new HttpException('ER_EMAIL_NOTF: Email is not exist', HttpStatus.UNAUTHORIZED)
@@ -62,6 +64,7 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_SECRET_KEY')
       })
       const checkToken = await this.userRepo.findOneBy({ email: verify.email, refresh_token })
+      console.log(checkToken)
       if (checkToken) {
         return this.generateToken({ id: verify.id, email: verify.email })
       } else {

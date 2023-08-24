@@ -1,5 +1,12 @@
 import { User } from 'src/user/entities/user.entity'
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm'
 
 @Entity()
 export class Song {
@@ -29,4 +36,7 @@ export class Song {
 
   @ManyToOne(() => User, user => user.songs)
   user: User
+
+  @ManyToMany(() => User, user => user.favoriteSongs)
+  likedUsers: User[]
 }

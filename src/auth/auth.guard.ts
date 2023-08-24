@@ -43,18 +43,9 @@ export class AuthGuard implements CanActivate {
         secret: this.configService.get<string>('JWT_SECRET_KEY')
       })
       const user = await this.userRepo.findOne({
-        where: { id: payload.id },
-        select: [
-          'id',
-          'first_name',
-          'last_name',
-          'email',
-          'role',
-          'avatar',
-          'created_at',
-          'updated_at'
-        ]
+        where: { id: payload.id }
       })
+
       request['user'] = user
     } catch (error) {
       throw new HttpException({ status: 419, message: 'token expired' }, 419)

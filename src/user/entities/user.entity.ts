@@ -1,3 +1,4 @@
+import { Role } from 'src/auth/role.enum'
 import { Song } from 'src/song/entities/song.entity'
 import {
   Column,
@@ -20,20 +21,20 @@ export class User {
   @Column()
   last_name: string
 
-  @Column()
+  @Column({ select: false })
   password: string
 
   @Column()
   email: string
 
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: null, select: false })
   refresh_token: string
 
   @Column({ nullable: true, default: null })
   avatar: string
 
-  @Column({ default: 'user' })
-  role: string
+  @Column({ default: Role.User })
+  role: Role
 
   @CreateDateColumn()
   created_at: Date
@@ -44,7 +45,7 @@ export class User {
   @OneToMany(() => Song, song => song.user)
   songs: Song[]
 
-  @ManyToMany(() => Song)
+  @ManyToMany(() => Song, song => song.likedUsers)
   @JoinTable()
   favoriteSongs: Song[]
 }

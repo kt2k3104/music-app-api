@@ -45,6 +45,7 @@ export class SongService {
       .leftJoinAndSelect('song.user', 'user')
       .leftJoinAndSelect('song.likedUsers', 'likedUsers')
       .loadRelationCountAndMap('song.likedUsers', 'song.likedUsers')
+      .orderBy('song.name', 'ASC')
       .getMany()
   }
 
@@ -146,17 +147,13 @@ export class SongService {
       })
 
       if (user) {
-        console.log(user)
         isFavorited = user.favoriteSongs.findIndex(item => {
           return item.id === song.id
         })
 
-        console.log(isFavorited)
-
         if (isFavorited > -1) {
           user.favoriteSongs = user.favoriteSongs.filter(item => item.id !== song.id)
         } else {
-          console.log('push')
           user.favoriteSongs.push(song)
         }
       }

@@ -11,6 +11,7 @@ async function bootstrap() {
     .addTag('Auth')
     .addTag('User')
     .addTag('Song')
+    .addTag('Playlist')
     .addBearerAuth()
     .build()
 

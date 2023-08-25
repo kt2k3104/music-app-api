@@ -55,6 +55,11 @@ export class UserService {
       relations: {
         songs: true,
         favoriteSongs: true
+      },
+      order: {
+        songs: {
+          name: 'ASC'
+        }
       }
     })
   }

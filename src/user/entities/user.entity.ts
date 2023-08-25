@@ -1,4 +1,5 @@
 import { Role } from 'src/auth/role.enum'
+import { Playlist } from 'src/playlist/entities/playlist.entity'
 import { Song } from 'src/song/entities/song.entity'
 import {
   Column,
@@ -48,4 +49,7 @@ export class User {
   @ManyToMany(() => Song, song => song.likedUsers)
   @JoinTable()
   favoriteSongs: Song[]
+
+  @OneToMany(() => Playlist, playlist => playlist.user)
+  playlists: Playlist[]
 }

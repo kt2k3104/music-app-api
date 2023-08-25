@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core'
 import { RolesGuard } from './auth/roles.guard'
 import { AuthGuard } from './auth/auth.guard'
 import { User } from './user/entities/user.entity'
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { User } from './user/entities/user.entity'
     ConfigModule.forRoot({ isGlobal: true }),
     SongModule,
     CloudinaryModule,
-    TypeOrmModule.forFeature([User])
+    TypeOrmModule.forFeature([User]),
+    PlaylistModule
   ],
   providers: [
     {

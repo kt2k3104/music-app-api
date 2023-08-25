@@ -6,6 +6,10 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { SongModule } from './song/song.module'
 import { CloudinaryModule } from './cloudinary/cloudinary.module'
+import { APP_GUARD } from '@nestjs/core'
+import { RolesGuard } from './auth/roles.guard'
+import { AuthGuard } from './auth/auth.guard'
+import { User } from './user/entities/user.entity'
 
 @Module({
   imports: [
@@ -14,7 +18,18 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module'
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     SongModule,
-    CloudinaryModule
+    CloudinaryModule,
+    TypeOrmModule.forFeature([User])
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }
   ]
 })
 export class AppModule {}

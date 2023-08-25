@@ -42,8 +42,6 @@ export class CloudinaryService {
     // musicapp-nest/images/avatars/ --> path in cloudiary folder
     let publish_id: string
 
-    console.log(url)
-
     if (type === 'image-avt') {
       publish_id =
         'musicapp-nest/images/avatars/' +
@@ -56,13 +54,10 @@ export class CloudinaryService {
       publish_id = 'musicapp-nest/audios/' + url.split('musicapp-nest/audios/')[1].split('.')[0]
     }
 
-    console.log(publish_id)
-
     try {
       const response = await v2.uploader.destroy(publish_id, {
         resource_type: type === 'audio' ? 'video' : 'image'
       })
-      console.log(response)
       return response
     } catch (error) {
       console.log(error)
@@ -71,7 +66,6 @@ export class CloudinaryService {
 
   private async clearFile(filePath: string) {
     filePath = path.join(__dirname, '..', '..', '..', filePath)
-    console.log(filePath)
     fs.unlink(filePath, err => {
       if (err) {
         console.log(err)

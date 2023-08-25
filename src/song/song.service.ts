@@ -40,36 +40,22 @@ export class SongService {
   }
 
   async getAllSong(): Promise<any> {
-    return await this.songRepo.find({
-      relations: {
-        user: true
-      },
-      select: {
-        user: {
-          id: true,
-          first_name: true,
-          last_name: true,
-          email: true
-        }
-      }
-    })
+    return await this.songRepo
+      .createQueryBuilder('song')
+      .leftJoinAndSelect('song.user', 'user')
+      .leftJoinAndSelect('song.likedUsers', 'likedUsers')
+      .loadRelationCountAndMap('song.likedUsers', 'song.likedUsers')
+      .getMany()
   }
 
   async getSong(songId: number): Promise<any> {
-    const song = await this.songRepo.findOne({
-      where: { id: songId },
-      relations: {
-        user: true
-      },
-      select: {
-        user: {
-          id: true,
-          first_name: true,
-          last_name: true,
-          email: true
-        }
-      }
-    })
+    const song = await this.songRepo
+      .createQueryBuilder('song')
+      .where('song.id = :id', { id: songId })
+      .leftJoinAndSelect('song.user', 'user')
+      .leftJoinAndSelect('song.likedUsers', 'likedUsers')
+      .loadRelationCountAndMap('song.likedUsers', 'song.likedUsers')
+      .getOne()
 
     if (!song) {
       throw new HttpException('Song not found!!', HttpStatus.NOT_FOUND)
@@ -156,7 +142,7 @@ export class SongService {
       const user = await this.userRepo.findOne({
         where: { id: userId },
         relations: { favoriteSongs: true },
-        select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
+        select: ['id', 'first_name', 'last_name', 'email', 'role', 'avatar']
       })
 
       if (user) {

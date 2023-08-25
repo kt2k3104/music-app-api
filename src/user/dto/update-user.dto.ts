@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber } from 'class-validator'
 
 export class UpdateUserDto {
   @ApiProperty()
@@ -7,8 +6,4 @@ export class UpdateUserDto {
 
   @ApiProperty()
   last_name: string
-
-  @ApiProperty()
-  @IsNumber()
-  status: number
 }

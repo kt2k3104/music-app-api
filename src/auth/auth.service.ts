@@ -18,7 +18,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<User> {
     const user = await this.userRepo.findOneBy({ email: registerDto.email })
-    console.log(user)
+
     if (user) {
       throw new HttpException(
         'ER_EMAIL_HAD_ACC: Email already have an account',
@@ -35,9 +35,11 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<any> {
-    const user = await this.userRepo.findOne({
-      where: { email: loginDto.email }
-    })
+    const user = await this.userRepo
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email: loginDto.email })
+      .addSelect('user.password')
+      .getOne()
 
     if (!user) {
       throw new HttpException('ER_EMAIL_NOTF: Email is not exist', HttpStatus.UNAUTHORIZED)
@@ -49,7 +51,7 @@ export class AuthService {
     }
 
     // generate access token and refresh token
-    const payload = { id: user.id, email: user.email, status: user.status }
+    const payload = { id: user.id, email: user.email }
 
     const tokens = await this.generateToken(payload)
 
@@ -57,12 +59,12 @@ export class AuthService {
   }
 
   async refreshToken(refresh_token: string): Promise<any> {
-    console.log(refresh_token)
     try {
       const verify = await this.jwtSercive.verifyAsync(refresh_token, {
         secret: this.configService.get<string>('JWT_SECRET_KEY')
       })
       const checkToken = await this.userRepo.findOneBy({ email: verify.email, refresh_token })
+      console.log(checkToken)
       if (checkToken) {
         return this.generateToken({ id: verify.id, email: verify.email })
       } else {
@@ -74,8 +76,6 @@ export class AuthService {
   }
 
   private async generateToken(payload: { id: number; email: string }) {
-    console.log(this.configService.get<string>('JWT_REFRESH_TOKEN_EXP_IN'))
-
     const access_token = await this.jwtSercive.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET_KEY'),
       expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP_IN')

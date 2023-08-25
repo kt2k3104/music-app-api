@@ -23,16 +23,6 @@ export class UserService {
     const skip = (page - 1) * items_per_page
 
     const [result, total] = await this.userRepo.findAndCount({
-      select: [
-        'id',
-        'first_name',
-        'last_name',
-        'email',
-        'status',
-        'avatar',
-        'created_at',
-        'updated_at'
-      ],
       order: { created_at: 'DESC' },
       take: items_per_page,
       skip: skip,
@@ -65,8 +55,7 @@ export class UserService {
       relations: {
         songs: true,
         favoriteSongs: true
-      },
-      select: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar']
+      }
     })
   }
 
@@ -82,7 +71,7 @@ export class UserService {
 
   async delete(id: number): Promise<DeleteResult> {
     const user = await this.userRepo.findOneBy({ id })
-    if (user) {
+    if (user.avatar) {
       await this.cloundaryService.destroyFile(user.avatar, 'image-avt')
     }
     return await this.userRepo.delete(id)

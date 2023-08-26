@@ -9,7 +9,7 @@ import {
   Post,
   Put,
   Query,
-  Request,
+  Req,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
@@ -22,8 +22,9 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { storageConfig } from 'helpers/config'
 import { filterImageConfig } from 'helpers/upload-file-config'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
-import { RoleRequire } from 'src/auth/decorator/role.decorator'
 import { Role } from 'src/auth/role.enum'
+import { GetUserRequest, RoleRequire } from 'src/auth/decorators'
+import { User } from './entities/user.entity'
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -44,8 +45,8 @@ export class UserController {
   }
 
   @Get(':id')
-  async getUser(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
-    if (req.user.id === id || req.user.role === Role.Admin) {
+  async getUser(@GetUserRequest() user: User, @Param('id', ParseIntPipe) id: number) {
+    if (user.id === id || user.role === Role.Admin) {
       return {
         success: true,
         result: await this.userService.getUser(id)
@@ -66,11 +67,11 @@ export class UserController {
 
   @Put(':id')
   async update(
-    @Request() req: any,
+    @GetUserRequest() user: User,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto
   ) {
-    if (req.user.id !== id) {
+    if (user.id !== id) {
       throw new BadRequestException('You do not have permission!')
     }
     return {
@@ -95,7 +96,7 @@ export class UserController {
       fileFilter: filterImageConfig()
     })
   )
-  async uploadAvatar(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+  async uploadAvatar(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError)
     }

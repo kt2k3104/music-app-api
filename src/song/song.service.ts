@@ -15,14 +15,11 @@ export class SongService {
     private cloudinary: CloudinaryService
   ) {}
 
-  async create(createSongDto: CreateSongDto, userId: number): Promise<any> {
-    const user = await this.userRepo.findOneBy({ id: userId })
-
+  async create(createSongDto: CreateSongDto, user: User): Promise<any> {
     return await this.songRepo.save({ ...createSongDto, user })
   }
 
-  async createBulk(createBulkSongDto: CreateBulkSongDto, userId: number): Promise<any> {
-    const user = await this.userRepo.findOneBy({ id: userId })
+  async createBulk(createBulkSongDto: CreateBulkSongDto, user: User): Promise<any> {
     let bulkData = []
 
     if (user) {
@@ -80,7 +77,7 @@ export class SongService {
     }
   }
 
-  async update(updateSongDto: UpdateSongDto, songId: number, userId: number): Promise<any> {
+  async update(updateSongDto: UpdateSongDto, songId: number, user: User): Promise<any> {
     const song = await this.songRepo.findOne({
       where: { id: songId },
       relations: {
@@ -96,14 +93,14 @@ export class SongService {
       }
     })
 
-    if (song.user.id !== userId) {
+    if (song.user.id !== user.id) {
       throw new BadRequestException('You do not have permission!')
     }
 
     return this.songRepo.update(songId, updateSongDto)
   }
 
-  async delete(songId: number, userId: number): Promise<any> {
+  async delete(songId: number, user: User): Promise<any> {
     const song = await this.songRepo.findOne({
       where: {
         id: songId
@@ -122,7 +119,7 @@ export class SongService {
     })
 
     if (song) {
-      if (song.user.id !== userId) {
+      if (song.user.id !== user.id) {
         throw new BadRequestException('You do not have permission!')
       }
 
@@ -142,8 +139,7 @@ export class SongService {
       }
       const user = await this.userRepo.findOne({
         where: { id: userId },
-        relations: { favoriteSongs: true },
-        select: ['id', 'first_name', 'last_name', 'email', 'role', 'avatar']
+        relations: { favoriteSongs: true }
       })
 
       if (user) {

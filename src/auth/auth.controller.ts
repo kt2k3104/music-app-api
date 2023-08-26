@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Post,
+  Req,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -10,7 +11,8 @@ import { RegisterDto } from './dto/register.dto'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { ApiTags } from '@nestjs/swagger'
-import { Public } from './decorator/publict.decorator'
+import { User } from 'src/user/entities/user.entity'
+import { GetUserRequest, Public } from './decorators'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -44,16 +46,12 @@ export class AuthController {
     }
   }
 
-  @Public(true)
   @Post('refresh-token')
-  async refreshToken(@Body() body: any): Promise<any> {
-    try {
-      return {
-        success: true,
-        result: await this.authService.refreshToken(body.refresh_token)
-      }
-    } catch (error) {
-      throw new BadRequestException(error.message)
+  async refreshToken(@GetUserRequest() user: User): Promise<any> {
+    console.log(user)
+    return {
+      success: true,
+      result: await this.authService.refreshToken(user)
     }
   }
 }

@@ -6,11 +6,11 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { SongModule } from './song/song.module'
 import { CloudinaryModule } from './cloudinary/cloudinary.module'
-import { APP_GUARD } from '@nestjs/core'
-import { RolesGuard } from './auth/roles.guard'
-import { AuthGuard } from './auth/auth.guard'
 import { User } from './user/entities/user.entity'
-import { PlaylistModule } from './playlist/playlist.module';
+import { PlaylistModule } from './playlist/playlist.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './auth/guards/jwt.guard'
+import { RolesGuard } from './auth/guards/roles.guard'
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { PlaylistModule } from './playlist/playlist.module';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
+      useClass: JwtAuthGuard
     },
     {
       provide: APP_GUARD,

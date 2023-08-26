@@ -18,6 +18,8 @@ import { CreatePlaylistDto } from './dto/create-playlist.dto'
 import { UpdatePlaylistDto } from './dto/update-playlist.dto'
 import { AddSongDto } from './dto/add-song.dto'
 import { RemoveSongDto } from './dto/remove-song.dto'
+import { GetUserRequest } from 'src/auth/decorators'
+import { User } from 'src/user/entities/user.entity'
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -27,67 +29,77 @@ export class PlaylistController {
 
   @UsePipes(ValidationPipe)
   @Post()
-  async create(@Request() req: any, @Body() createPlaylistDto: CreatePlaylistDto): Promise<any> {
+  async create(
+    @GetUserRequest() user: User,
+    @Body() createPlaylistDto: CreatePlaylistDto
+  ): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.create(createPlaylistDto, req.user.id)
+      result: await this.playlistService.create(createPlaylistDto, user)
     }
   }
 
   @Get()
-  async getAllByUserId(@Request() req: any): Promise<any> {
+  async getAllByUserId(@GetUserRequest() user: User): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.getAllByUserId(req.user.id)
+      result: await this.playlistService.getAllByUserId(user)
     }
   }
 
   @Get(':id')
-  async getById(@Request() req: any, @Param('id', ParseIntPipe) playlistId: number): Promise<any> {
+  async getById(
+    @GetUserRequest() user: User,
+    @Param('id', ParseIntPipe) playlistId: number
+  ): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.getById(playlistId, req.user.id)
+      result: await this.playlistService.getById(playlistId, user)
     }
   }
 
   @UsePipes(ValidationPipe)
   @Put(':id')
   async update(
-    @Request() req: any,
+    @GetUserRequest() user: User,
     @Body() updatePlaylistDto: UpdatePlaylistDto,
     @Param('id', ParseIntPipe) playlistId: number
   ): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.update(updatePlaylistDto, playlistId, req.user.id)
+      result: await this.playlistService.update(updatePlaylistDto, playlistId, user)
     }
   }
 
   @Delete(':id')
-  async delete(@Request() req: any, @Param('id', ParseIntPipe) playlistId: number): Promise<any> {
+  async delete(
+    @GetUserRequest() user: User,
+    @Param('id', ParseIntPipe) playlistId: number
+  ): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.delete(playlistId, req.user.id)
+      result: await this.playlistService.delete(playlistId, user)
     }
   }
 
   @UsePipes(ValidationPipe)
   @Patch('add')
-  async addSong(@Request() req: any, @Body() addSongDto: AddSongDto): Promise<any> {
-    console.log(addSongDto)
+  async addSong(@GetUserRequest() user: User, @Body() addSongDto: AddSongDto): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.addSong(addSongDto, req.user.id)
+      result: await this.playlistService.addSong(addSongDto, user)
     }
   }
 
   @UsePipes(ValidationPipe)
   @Patch('remove')
-  async removeSong(@Request() req: any, @Body() removeSongDto: RemoveSongDto): Promise<any> {
-    console.log(removeSongDto)
+  async removeSong(
+    @GetUserRequest() user: User,
+    @Body() removeSongDto: RemoveSongDto
+  ): Promise<any> {
     return {
       success: true,
-      result: await this.playlistService.removeSong(removeSongDto, req.user.id)
+      result: await this.playlistService.removeSong(removeSongDto, user)
     }
   }
 }

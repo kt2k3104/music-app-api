@@ -23,7 +23,9 @@ import { CreateSongDto } from './dto/create-song.dto'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { UpdateSongDto } from './dto/update-song.dto'
-import { Public } from 'src/auth/decorator/publict.decorator'
+import { Public } from 'src/auth/decorators/public.decorator'
+import { GetUserRequest } from 'src/auth/decorators'
+import { User } from 'src/user/entities/user.entity'
 
 @ApiTags('Song')
 @Controller('songs')
@@ -35,15 +37,18 @@ export class SongController {
 
   @ApiBearerAuth()
   @Post('bulk')
-  createBulk(@Request() req: any, @Body() createBulkSongDto: CreateBulkSongDto): Promise<any> {
-    return this.songService.createBulk(createBulkSongDto, req.user.id)
+  createBulk(
+    @GetUserRequest() user: User,
+    @Body() createBulkSongDto: CreateBulkSongDto
+  ): Promise<any> {
+    return this.songService.createBulk(createBulkSongDto, user)
   }
 
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @Post()
-  async create(@Request() req: any, @Body() createSongDto: CreateSongDto) {
-    const result = await this.songService.create(createSongDto, req.user.id)
+  async create(@GetUserRequest() user: User, @Body() createSongDto: CreateSongDto) {
+    const result = await this.songService.create(createSongDto, user)
     result.user = result.user.id
     return {
       success: true,
@@ -70,8 +75,6 @@ export class SongController {
     }
 
     const cloudFile = await this.cloudinaryService.uploadFile(file, 'audio')
-
-    console.log(cloudFile)
 
     return {
       success: true,
@@ -141,19 +144,19 @@ export class SongController {
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) songId: number,
-    @Request() req: any,
+    @GetUserRequest() user: User,
     @Body() updateSongDto: UpdateSongDto
   ) {
     return {
       success: true,
-      result: await this.songService.update(updateSongDto, songId, req.user.id)
+      result: await this.songService.update(updateSongDto, songId, user)
     }
   }
 
   @ApiBearerAuth()
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) songId: number, @Request() req: any) {
-    await this.songService.delete(songId, req.user.id)
+  async delete(@Param('id', ParseIntPipe) songId: number, @GetUserRequest() user: User) {
+    await this.songService.delete(songId, user)
     return {
       success: true
     }
@@ -162,11 +165,11 @@ export class SongController {
   @ApiBearerAuth()
   @Get('favorite/:id')
   async changeFavorite(
-    @Request() req: any,
+    @GetUserRequest() user: User,
     @Param('id', ParseIntPipe) songId: number
   ): Promise<any> {
     try {
-      return await this.songService.changeFavorite(req.user.id, songId)
+      return await this.songService.changeFavorite(user.id, songId)
     } catch (error) {
       throw new BadRequestException(error.message)
     }

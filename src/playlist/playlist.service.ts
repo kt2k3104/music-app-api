@@ -17,21 +17,16 @@ export class PlaylistService {
     @InjectRepository(Playlist) private playlistRepo: Repository<Playlist>
   ) {}
 
-  async create(createPlaylistDto: CreatePlaylistDto, userId: number): Promise<any> {
-    const user = await this.userRepo.findOneBy({ id: userId })
-    if (!user) {
-      throw new BadRequestException('Songthing wrong, user not found!!')
-    }
-
+  async create(createPlaylistDto: CreatePlaylistDto, user: User): Promise<any> {
     return await this.playlistRepo.save({ ...createPlaylistDto, user })
   }
 
-  async getAllByUserId(userId: number): Promise<any> {
+  async getAllByUserId(user: User): Promise<any> {
     try {
       return await this.playlistRepo.find({
         where: {
           user: {
-            id: userId
+            id: user.id
           }
         },
         relations: {
@@ -49,7 +44,7 @@ export class PlaylistService {
     }
   }
 
-  async getById(playlistId: number, userId: number): Promise<any> {
+  async getById(playlistId: number, user: User): Promise<any> {
     const playlist = await this.playlistRepo.findOne({
       where: { id: playlistId },
       relations: {
@@ -72,18 +67,14 @@ export class PlaylistService {
       throw new HttpException('Playlist not found !', HttpStatus.NOT_FOUND)
     }
 
-    if (playlist.user.id !== userId) {
+    if (playlist.user.id !== user.id) {
       throw new BadRequestException('you can not access this playlist')
     }
 
     return playlist
   }
 
-  async update(
-    updatePlaylistDto: UpdatePlaylistDto,
-    playlistId: number,
-    userId: number
-  ): Promise<any> {
+  async update(updatePlaylistDto: UpdatePlaylistDto, playlistId: number, user: User): Promise<any> {
     const playlist = await this.playlistRepo.findOne({
       where: { id: playlistId },
       relations: {
@@ -100,14 +91,14 @@ export class PlaylistService {
       throw new HttpException('Playlist not found !', HttpStatus.NOT_FOUND)
     }
 
-    if (playlist.user.id !== userId) {
+    if (playlist.user.id !== user.id) {
       throw new BadRequestException('you can not access this playlist')
     }
 
     return await this.playlistRepo.update(playlistId, updatePlaylistDto)
   }
 
-  async delete(playlistId: number, userId: number): Promise<any> {
+  async delete(playlistId: number, user: User): Promise<any> {
     const playlist = await this.playlistRepo.findOne({
       where: { id: playlistId },
       relations: {
@@ -124,14 +115,14 @@ export class PlaylistService {
       throw new HttpException('Playlist not found !', HttpStatus.NOT_FOUND)
     }
 
-    if (playlist.user.id !== userId) {
+    if (playlist.user.id !== user.id) {
       throw new BadRequestException('you can not access this playlist')
     }
 
     return this.playlistRepo.delete(playlistId)
   }
 
-  async addSong(addSongDto: AddSongDto, userId: number): Promise<any> {
+  async addSong(addSongDto: AddSongDto, user: User): Promise<any> {
     const playlist = await this.playlistRepo.findOne({
       where: {
         id: addSongDto.playlistId
@@ -157,7 +148,7 @@ export class PlaylistService {
       throw new HttpException('Playlist not found !', HttpStatus.NOT_FOUND)
     }
 
-    if (playlist.user.id !== userId) {
+    if (playlist.user.id !== user.id) {
       throw new BadRequestException('you can not access this playlist')
     }
 
@@ -170,7 +161,7 @@ export class PlaylistService {
     return await this.playlistRepo.save(playlist)
   }
 
-  async removeSong(removeSongDto: RemoveSongDto, userId: number): Promise<any> {
+  async removeSong(removeSongDto: RemoveSongDto, user: User): Promise<any> {
     const playlist = await this.playlistRepo.findOne({
       where: {
         id: removeSongDto.playlistId
@@ -196,7 +187,7 @@ export class PlaylistService {
       throw new HttpException('Playlist not found !', HttpStatus.NOT_FOUND)
     }
 
-    if (playlist.user.id !== userId) {
+    if (playlist.user.id !== user.id) {
       throw new BadRequestException('you can not access this playlist')
     }
 

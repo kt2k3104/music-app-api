@@ -62,7 +62,7 @@ export class AuthService {
     return this.generateToken({ id: user.id, email: user.email })
   }
 
-  private async generateToken(payload: { id: number; email: string }) {
+  public async generateToken(payload: { id: number; email: string }) {
     const access_token = await this.jwtSercive.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET_KEY'),
       expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP_IN')

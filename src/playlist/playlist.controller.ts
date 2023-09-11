@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Put,
-  Request,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumberString, IsUrl } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsNumberString, IsUrl } from 'class-validator'
 
 export class CreateSongDto {
   @ApiProperty()
@@ -22,6 +22,6 @@ export class CreateSongDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumberString()
+  @IsNumber()
   duration: number
 }

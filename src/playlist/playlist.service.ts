@@ -33,10 +33,10 @@ export class PlaylistService {
           songs: true
         },
         order: {
+          created_at: 'ASC',
           songs: {
             name: 'ASC'
-          },
-          name: 'ASC'
+          }
         }
       })
     } catch (error) {
@@ -134,6 +134,11 @@ export class PlaylistService {
       select: {
         user: {
           id: true
+        }
+      },
+      order: {
+        songs: {
+          name: 'ASC'
         }
       }
     })

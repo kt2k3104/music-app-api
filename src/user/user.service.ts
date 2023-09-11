@@ -59,6 +59,9 @@ export class UserService {
       order: {
         songs: {
           name: 'ASC'
+        },
+        favoriteSongs: {
+          name: 'ASC'
         }
       }
     })

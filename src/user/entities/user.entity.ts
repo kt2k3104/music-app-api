@@ -1,3 +1,4 @@
+import { AccountType } from 'src/auth/acc-type.enum'
 import { Role } from 'src/auth/role.enum'
 import { Playlist } from 'src/playlist/entities/playlist.entity'
 import { Song } from 'src/song/entities/song.entity'
@@ -36,6 +37,9 @@ export class User {
 
   @Column({ default: Role.User })
   role: Role
+
+  @Column({ default: AccountType.Local })
+  account_type: AccountType
 
   @CreateDateColumn()
   created_at: Date

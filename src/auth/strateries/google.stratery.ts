@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Profile, Strategy } from 'passport-google-oauth20'
 import { User } from 'src/user/entities/user.entity'
 import { Repository } from 'typeorm'
+import { AccountType } from '../acc-type.enum'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
@@ -29,7 +30,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         last_name: profile.name.familyName,
         email: profile.emails[0].value,
         password: 'google',
-        avater: profile.photos[0].value
+        avater: profile.photos[0].value,
+        account_type: AccountType.Google
       })
     }
 

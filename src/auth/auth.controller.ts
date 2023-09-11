@@ -2,8 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
-  Req,
+  UseGuards,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -13,6 +14,7 @@ import { LoginDto } from './dto/login.dto'
 import { ApiTags } from '@nestjs/swagger'
 import { User } from 'src/user/entities/user.entity'
 import { GetUserRequest, Public } from './decorators'
+import { GoogleAuthGuard } from './guards/google.guard'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -53,5 +55,32 @@ export class AuthController {
       success: true,
       result: await this.authService.refreshToken(user)
     }
+  }
+
+  @Get('google/login')
+  @UseGuards(GoogleAuthGuard)
+  @Public(true)
+  googleLogin() {
+    return {
+      message: 'authenticated'
+    }
+  }
+
+  @Get('google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  @Public(true)
+  async googleLoginRedirect(@GetUserRequest() user: User) {
+    console.log(user)
+    const tokens = await this.authService.generateToken({ id: user.id, email: user.email })
+    const htmlWithEmbeddedJWT = `
+    <html>
+      <script>
+        // Redirect browser to root of application
+        window.location.href = 'http://localhost:3000/login/success?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}';
+      </script>
+    </html>
+    `
+
+    return htmlWithEmbeddedJWT
   }
 }

@@ -67,6 +67,26 @@ export class UserService {
     })
   }
 
+  async getCurrUser(id: number): Promise<User> {
+    return await this.userRepo.findOne({
+      where: {
+        id
+      },
+      relations: {
+        songs: true,
+        favoriteSongs: true
+      },
+      order: {
+        songs: {
+          name: 'ASC'
+        },
+        favoriteSongs: {
+          name: 'ASC'
+        }
+      }
+    })
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashPassword = await bcrypt.hash(createUserDto.password, 10)
 

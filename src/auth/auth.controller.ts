@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Post,
   UseGuards,
   UsePipes,
@@ -68,6 +69,7 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
+  @Header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
   @Public(true)
   async googleLoginRedirect(@GetUserRequest() user: User) {
     console.log(user)
@@ -76,7 +78,7 @@ export class AuthController {
     <html>
       <script>
         // Redirect browser to root of application
-        window.location.href = 'http://localhost:3000/login/success?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}';
+        window.location.href = 'http://localhost:3000/oauth/redirect?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}';
       </script>
     </html>
     `

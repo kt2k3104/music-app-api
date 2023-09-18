@@ -56,6 +56,15 @@ export class UserController {
     }
   }
 
+  @Get('curr/info')
+  async getCurrUser(@GetUserRequest() user: User) {
+    const userDetail = await this.userService.getCurrUser(user.id)
+    return {
+      success: true,
+      result: userDetail
+    }
+  }
+
   @RoleRequire(Role.Admin)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {

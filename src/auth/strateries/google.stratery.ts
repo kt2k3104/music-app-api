@@ -22,7 +22,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
   }
   async validate(accesToken: string, refreshToken: string, profile: Profile) {
     const user = await this.userRepo.findOneBy({ email: profile.emails[0].value })
-    console.log(user)
 
     if (!user) {
       return await this.userRepo.save({
@@ -30,9 +29,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         last_name: profile.name.familyName,
         email: profile.emails[0].value,
         password: 'google',
-        avater: profile.photos[0].value,
+        avatar: profile.photos[0].value,
         account_type: AccountType.Google
       })
+    }
+
+    if (user.avatar !== profile.photos[0].value) {
+      await this.userRepo.update(user.id, { avatar: profile.photos[0].value })
     }
 
     return user

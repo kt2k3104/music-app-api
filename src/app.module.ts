@@ -11,6 +11,8 @@ import { PlaylistModule } from './playlist/playlist.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './auth/guards/jwt.guard'
 import { RolesGuard } from './auth/guards/roles.guard'
+import { GatewayModule } from './gateway/gateway.module'
+import { NotificationModule } from './notification/notification.module'
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { RolesGuard } from './auth/guards/roles.guard'
     SongModule,
     CloudinaryModule,
     TypeOrmModule.forFeature([User]),
-    PlaylistModule
+    PlaylistModule,
+    GatewayModule,
+    NotificationModule
   ],
   providers: [
     {

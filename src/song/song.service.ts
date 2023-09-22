@@ -4,15 +4,19 @@ import { Song } from './entities/song.entity'
 import { Like, Repository } from 'typeorm'
 import { CreateBulkSongDto } from './dto/create-bulk-song.dto'
 import { User } from 'src/user/entities/user.entity'
+import { Notification } from 'src/notification/entities/notification.entity'
 import { CreateSongDto } from './dto/create-song.dto'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 import { UpdateSongDto } from './dto/update-song.dto'
+import { EventGateway } from 'src/gateway/gateway'
 @Injectable()
 export class SongService {
   constructor(
     @InjectRepository(Song) private songRepo: Repository<Song>,
     @InjectRepository(User) private userRepo: Repository<User>,
-    private cloudinary: CloudinaryService
+    @InjectRepository(Notification) private notiRepo: Repository<Notification>,
+    private cloudinary: CloudinaryService,
+    private eventGateway: EventGateway
   ) {}
 
   async create(createSongDto: CreateSongDto, user: User): Promise<any> {
@@ -141,7 +145,22 @@ export class SongService {
   async changeFavorite(userId: number, songId: number): Promise<any> {
     try {
       let isFavorited: number = -1
-      const song = await this.songRepo.findOneBy({ id: songId })
+      const song = await this.songRepo.findOne({
+        where: {
+          id: songId
+        },
+        relations: {
+          user: true
+        },
+        select: {
+          user: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true
+          }
+        }
+      })
       if (!song) {
         throw new HttpException('Song not found', HttpStatus.NOT_FOUND)
       }
@@ -160,6 +179,31 @@ export class SongService {
         } else {
           user.favoriteSongs.push(song)
         }
+      }
+
+      // create notification
+      if (isFavorited < 0 && user.id !== song.user.id) {
+        const noti = await this.notiRepo.save({
+          content: `${user.first_name} đã thêm bài ${song.name} vào danh sách yêu thích`,
+          user: song.user
+        })
+        console.log(noti)
+        this.eventGateway.handleEmitSocket({
+          data: noti.content,
+          event: 'notify',
+          to: song.user.email
+        })
+      }
+
+      if (isFavorited > -1 && user.id !== song.user.id) {
+        const str = `${user.first_name} đã thêm bài ${song.name}`
+        const notifi = await this.notiRepo.findOne({
+          where: {
+            content: Like(`%${str}%`)
+          }
+        })
+
+        await this.notiRepo.delete(notifi.id)
       }
 
       return {

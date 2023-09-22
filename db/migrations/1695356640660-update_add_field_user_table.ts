@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddNewFieldAccountTypeUserTable1694427146565 implements MigrationInterface {
-    name = 'AddNewFieldAccountTypeUserTable1694427146565'
+export class UpdateAddFieldUserTable1695356640660 implements MigrationInterface {
+    name = 'UpdateAddFieldUserTable1695356640660'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`user\` ADD \`account_type\` varchar(255) NOT NULL DEFAULT 'local'`);

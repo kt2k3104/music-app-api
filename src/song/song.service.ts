@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Song } from './entities/song.entity'
-import { Repository } from 'typeorm'
+import { Like, Repository } from 'typeorm'
 import { CreateBulkSongDto } from './dto/create-bulk-song.dto'
 import { User } from 'src/user/entities/user.entity'
 import { CreateSongDto } from './dto/create-song.dto'
@@ -44,6 +44,14 @@ export class SongService {
       .loadRelationCountAndMap('song.likedUsers', 'song.likedUsers')
       .orderBy('song.name', 'ASC')
       .getMany()
+  }
+
+  async searchSongs(keyword: string) {
+    return await this.songRepo.find({
+      where: {
+        name: Like(`%${keyword}%`)
+      }
+    })
   }
 
   async getSong(songId: number): Promise<any> {

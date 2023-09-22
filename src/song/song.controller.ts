@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Request,
   UploadedFile,
   UseInterceptors,
@@ -122,6 +123,17 @@ export class SongController {
     }
   }
 
+  @Public(true)
+  @Get('search')
+  async searchSongs(@Query() query: any): Promise<any> {
+    return {
+      success: true,
+      result: await this.songService.searchSongs(query.keyword)
+    }
+  }
+
+  @Public(true)
+  @Get('')
   @Public(true)
   @Get(':id')
   async getSong(@Param('id', ParseIntPipe) songId: number): Promise<any> {

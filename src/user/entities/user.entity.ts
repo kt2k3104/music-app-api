@@ -1,3 +1,4 @@
+import { Notification } from './../../notification/entities/notification.entity'
 import { AccountType } from 'src/auth/acc-type.enum'
 import { Role } from 'src/auth/role.enum'
 import { Playlist } from 'src/playlist/entities/playlist.entity'
@@ -49,6 +50,9 @@ export class User {
 
   @OneToMany(() => Song, song => song.user)
   songs: Song[]
+
+  @OneToMany(() => Notification, notification => notification.user)
+  notifications: Notification[]
 
   @ManyToMany(() => Song, song => song.likedUsers)
   @JoinTable()

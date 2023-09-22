@@ -1,16 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumberString, IsNumber } from 'class-validator'
+import { IsNotEmpty, IsNumber } from 'class-validator'
 
 export class RemoveSongDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumberString()
-  // @IsNumber()
+  @IsNumber()
   songId: number
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumberString()
-  // @IsNumber()
+  @IsNumber()
   playlistId: number
 }

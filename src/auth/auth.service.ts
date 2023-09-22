@@ -76,6 +76,18 @@ export class AuthService {
     return { access_token, refresh_token }
   }
 
+  public async handleVerifyToken(token: string) {
+    try {
+      const payload = await this.jwtSercive.verifyAsync(token, {
+        secret: this.configService.get<string>('JWT_SECRET_KEY')
+      })
+      console.log(payload)
+      return payload['email']
+    } catch (e) {
+      throw new HttpException('unauthorized', HttpStatus.UNAUTHORIZED)
+    }
+  }
+
   private async hashPassword(password: string): Promise<string> {
     const saltRound = 10
     const salt = await bcrypt.genSalt(saltRound)

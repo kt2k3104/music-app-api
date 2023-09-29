@@ -189,21 +189,27 @@ export class SongService {
         })
         console.log(noti)
         this.eventGateway.handleEmitSocket({
-          data: noti.content,
-          event: 'notify',
+          data: noti,
+          event: 'like',
           to: song.user.email
         })
       }
 
       if (isFavorited > -1 && user.id !== song.user.id) {
         const str = `${user.first_name} đã thêm bài ${song.name}`
-        const notifi = await this.notiRepo.findOne({
+        const noti = await this.notiRepo.findOne({
           where: {
             content: Like(`%${str}%`)
           }
         })
 
-        await this.notiRepo.delete(notifi.id)
+        await this.notiRepo.delete(noti.id)
+
+        this.eventGateway.handleEmitSocket({
+          data: noti,
+          event: 'unlike',
+          to: song.user.email
+        })
       }
 
       return {

@@ -16,11 +16,15 @@ import { ApiTags } from '@nestjs/swagger'
 import { User } from 'src/user/entities/user.entity'
 import { GetUserRequest, Public } from './decorators'
 import { GoogleAuthGuard } from './guards/google.guard'
+import { ConfigService } from '@nestjs/config'
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService
+  ) {}
 
   @Public(true)
   @Post('register')
@@ -78,7 +82,11 @@ export class AuthController {
     <html>
       <script>
         // Redirect browser to root of application
-        window.location.href = 'http://localhost:3000/oauth/redirect?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}';
+        window.location.href = '${this.configService.get<string>(
+          'FE_HOST'
+        )}/oauth/redirect?access_token=${tokens.access_token}&refresh_token=${
+          tokens.refresh_token
+        }';
       </script>
     </html>
     `
